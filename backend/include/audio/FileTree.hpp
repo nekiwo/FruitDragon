@@ -22,10 +22,10 @@ class FileTree {
         AudioCollection Singles;
         std::vector<AudioCollection> Albums;
         std::vector<AudioCollection> Playlists;
-        int loadFromFilePath(std::string filePath);
-        
+        int loadFromPath(std::string folderPath);
+
     private:
-        int indexFilePath(std::string filePath);
+        int indexPath(std::string folderPath);
 };
 
 #endif

@@ -153,3 +153,6 @@ vite.config.ts.timestamp-*
 # Builds & CMake
 backend/build
 backend/bin
+
+# VS Code
+.vscode

@@ -8,6 +8,7 @@ option(TEST "Build all tests." OFF)
 # Directories
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include") 
 
 # Code
 file(GLOB_RECURSE sources src/*.cpp)
@@ -34,10 +35,12 @@ if (TEST)
 
     include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 
-    file(GLOB_RECURSE test_sources src/*.cpp)
-    add_executable(serverTests ${test_sources})
-
-    target_link_libraries(serverTests gtest gtest_main)
-
-    add_test(all-tests serverTests)
+    file(GLOB_RECURSE test_sources ${CMAKE_SOURCE_DIR}/tests/*.cpp)
+    foreach(test_source ${test_sources})
+        get_filename_component(test_source_name ${test_source} NAME_WE)
+        add_executable(${test_source_name} ${test_source})
+        set_target_properties(${test_source_name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tests)
+        target_link_libraries(${test_source_name} gtest gtest_main serverLib)
+        add_test(${test_source_name} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tests/${test_source_name})
+    endforeach()
 endif()

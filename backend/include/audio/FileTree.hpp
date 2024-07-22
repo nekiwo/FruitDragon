@@ -14,7 +14,7 @@
 
 #include <string>
 #include <vector>
-#include "AudioCollection.hpp"
+#include "audio/AudioCollection.hpp"
 
 class FileTree {
     public:
@@ -23,9 +23,6 @@ class FileTree {
         std::vector<AudioCollection> Albums;
         std::vector<AudioCollection> Playlists;
         int loadFromPath(std::string folderPath);
-
-    private:
-        int indexPath(std::string folderPath);
 };
 
 #endif

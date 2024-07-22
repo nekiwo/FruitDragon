@@ -9,7 +9,14 @@
  * 
  */
 
-#include "FileTree.hpp"
+#include <iostream>
+#include <filesystem>
+#include <string>
+
+#include "audio/FileTree.hpp"
+#include "audio/AudioCollection.hpp"
+
+namespace fs = std::filesystem;
 
 
 FileTree::FileTree() {
@@ -23,15 +30,25 @@ FileTree::FileTree() {
  * @return Read error code
  */
 int FileTree::loadFromPath(std::string folderPath) {
+    if (!fs::is_directory(folderPath)) {
+        return 2;
+    }
 
-}
+    for (const auto &entry : fs::directory_iterator(folderPath)) {
+        fs::path path = entry.path();
+        std::string dirName = path.parent_path().filename();
 
-/**
- * @brief Indexes all tracks in specified path and converts them to lossless audio
- * 
- * @param folderPath Path to stored media
- * @return Read error code
- */
-int FileTree::indexPath(std::string folderPath) {
+        if (dirName == "Singles") {
+            this->Singles.indexCollection(path);
+        } else if (dirName == "Albums") {
+            for (const auto &albumEntry : fs::directory_iterator(folderPath)) {
+                fs::path albumDir = albumEntry.path();
+                AudioCollection album;
+                album.indexCollection(albumDir);
+                this->Albums.push_back(album);
+            }
+        }
+    }
 
+    return 0;
 }

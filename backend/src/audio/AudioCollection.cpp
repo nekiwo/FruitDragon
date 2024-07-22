@@ -9,7 +9,7 @@
  * 
  */
 
-#include "AudioCollection.hpp"
+#include "audio/AudioCollection.hpp"
 
 
 AudioCollection::AudioCollection() {
@@ -20,11 +20,19 @@ AudioCollection::AudioCollection() {
  * @brief Indexes all tracks in specified path and converts them to lossless audio
  * 
  * @param folderPath Path to stored collection
- * @param configPath Path to config folder
  * @return Read error code
  */
-int AudioCollection::indexCollection(std::string folderPath, std::string configPath) {
+int AudioCollection::indexCollection(std::string folderPath) {
 
+}
+
+/**
+ * @brief Adds a track to the list
+ * 
+ * @param track Track object
+ */
+void AudioCollection::addTrack(RawAudio &track) {
+    this->tracks.push_back(track);
 }
 
 /**
@@ -33,7 +41,7 @@ int AudioCollection::indexCollection(std::string folderPath, std::string configP
  * @param configPath Path to config folder
  * @return Read error code
  */
-int AudioCollection::indexFromJSON(std::string configPath) {
+int AudioCollection::indexFromJSON() {
 
 }
 
@@ -43,6 +51,6 @@ int AudioCollection::indexFromJSON(std::string configPath) {
  * @param configPath Path to config folder
  * @return Read error code
  */
-int AudioCollection::saveToJSON(std::string configPath) {
+int AudioCollection::saveToJSON() {
 
 }

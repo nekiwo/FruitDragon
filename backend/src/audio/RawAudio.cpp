@@ -9,10 +9,20 @@
  * 
  */
 
-#include "RawAudio.hpp"
+#include "audio/RawAudio.hpp"
 
 
 RawAudio::RawAudio() {
+
+}
+
+/**
+ * @brief Loads the audio metadata into the class object
+ * 
+ * @param filePath Path to the audio file
+ * @return Read error code
+ */
+int RawAudio::readFromFile(std::string filePath) {
 
 }
 

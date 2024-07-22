@@ -14,7 +14,7 @@
 
 #include <string>
 #include <vector>
-#include "RawAudio.hpp"
+#include "audio/RawAudio.hpp"
 
 class AudioCollection {
     public:
@@ -22,12 +22,13 @@ class AudioCollection {
         std::string Name;
         std::string ID;
         std::string CoverFilePath;
-        std::vector<RawAudio> Tracks;
-        int indexCollection(std::string folderPath, std::string configPath);
+        int indexCollection(std::string folderPath);
+        void addTrack(RawAudio &track);
 
     private:
-        int indexFromJSON(std::string configPath);
-        int saveToJSON(std::string configPath);
+        std::vector<RawAudio> tracks;
+        int indexFromJSON();
+        int saveToJSON();
 };
 
 #endif

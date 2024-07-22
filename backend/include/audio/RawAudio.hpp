@@ -21,6 +21,7 @@ class RawAudio {
         std::string Name;
         std::string AudioFilePath;
         std::string CoverFilePath;
+        int readFromFile(std::string filePath);
         int loadFromFile(std::string filePath);
         char* getBuffer(int startIndex, int endIndex);
 };

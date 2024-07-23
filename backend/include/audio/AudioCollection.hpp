@@ -26,14 +26,17 @@ class AudioCollection {
         AudioCollection();
         std::string Name;
         std::string ID;
-        std::string CoverFilePath;
+        fs::path CoverFilePath;
         int indexCollection(fs::path folderPath);
         void addTrack(RawAudio &track);
         int getTrackCount();
 
     private:
-        std::unordered_set<std::string> supportedIconExtensions;
-        std::vector<RawAudio> tracks;
+        // Commonly supported web image file formats
+        std::unordered_set<std::string> supportedIconExtensions = {".apng", ".png", ".avif", ".gif", ".jpg", ".jpeg", ".jfif", ".pjpeg", ".pjp", ".webp"};
+        // Commonly supported web sound file formats
+        std::unordered_set<std::string> supportedTrackExtensions = {".aiff", ".flac", ".m4a", ".mp3", ".ogg", ".wav", ".webm"};
+        std::vector<RawAudio*> tracks;
         int indexFromJSON();
         int saveToJSON();
 };

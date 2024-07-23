@@ -1,5 +1,5 @@
 /**
- * @file AudioCollection.hpp
+ * @file AudioCollection.cpp
  * @author nekiwo
  * @brief Audio collection that represents a list of files and metadata
  * @version 0.1
@@ -15,6 +15,7 @@
 #include <filesystem>
 #include <string>
 #include <iostream>
+#include <regex>
 #include <vector>
 #include <unordered_set>
 
@@ -22,7 +23,7 @@ namespace fs = std::filesystem;
 
 
 AudioCollection::AudioCollection() {
-    supportedIconExtensions.insert(".png");
+    
 }
 
 /**
@@ -36,15 +37,30 @@ int AudioCollection::indexCollection(fs::path folderPath) {
         return 2;
     }
 
+    this->Name = folderPath.filename();
+
     for (const auto &entry : fs::directory_iterator(folderPath)) {
-        fs::path path = entry.path();
-        std::string trackFileName = path.filename();
+        fs::path trackPath = entry.path();
+        std::string trackFileName = trackPath.filename();
 
         // Overwritten icon of the album
-        if (path.stem() == "icon" && supportedIconExtensions.contains(path.extension())) {
+        if (trackPath.stem() == "icon" && this->Name != "Singles" && supportedIconExtensions.contains(trackPath.extension())) {
+            this->CoverFilePath = trackPath;
+            continue;
+        }
 
+        // Check if it's an audio file
+        if (supportedTrackExtensions.contains(trackPath.extension())) {
+            std::string trackName = std::regex_replace((std::string)trackPath.stem(), std::regex("_"), " ");
+            
+            RawAudio track;
+            track.Name = trackName;
+
+            this->addTrack(track);
         }
     }
+
+    return 0;
 }
 
 /**
@@ -53,7 +69,7 @@ int AudioCollection::indexCollection(fs::path folderPath) {
  * @param track Track object
  */
 void AudioCollection::addTrack(RawAudio &track) {
-    this->tracks.push_back(track);
+    this->tracks.push_back(&track);
 }
 
 /**

@@ -43,4 +43,6 @@ if (TEST)
         target_link_libraries(${test_source_name} gtest gtest_main serverLib)
         add_test(${test_source_name} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tests/${test_source_name})
     endforeach()
+
+    file(REMOVE_RECURSE ${CMAKE_SOURCE_DIR}/tests/music/Cache)
 endif()

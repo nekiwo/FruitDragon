@@ -12,11 +12,12 @@
 #ifndef AUDIO_COLLECTION
 #define AUDIO_COLLECTION
 
+#include "audio/AudioCacheTable.hpp"
+#include "audio/RawAudio.hpp"
 #include <filesystem>
 #include <string>
 #include <unordered_set>
 #include <vector>
-#include "audio/RawAudio.hpp"
 
 namespace fs = std::filesystem;
 
@@ -27,7 +28,7 @@ class AudioCollection {
         std::string Name;
         std::string ID;
         fs::path CoverFilePath;
-        int indexCollection(fs::path folderPath);
+        int indexCollection(fs::path &collectionPath, AudioCacheTable &cache);
         void addTrack(RawAudio &track);
         int getTrackCount();
 

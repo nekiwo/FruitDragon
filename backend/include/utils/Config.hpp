@@ -12,6 +12,7 @@
 #ifndef CONFIG
 #define CONFIG
 
+#include "audio/AudioCacheTable.hpp"
 #include <filesystem>
 #include <string>
 
@@ -23,7 +24,8 @@ class Config {
         Config();
         fs::path MediaFolderPath;
         int Port;
-        int readFromFile(std::string filePath);
+        int readFromFolder(std::string &folderPath);
+        AudioCacheTable* Cache;
 };
 
 #endif

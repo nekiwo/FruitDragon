@@ -11,6 +11,7 @@
 
 #include "audio/AudioCollection.hpp"
 
+#include "audio/AudioCacheTable.hpp"
 #include "audio/RawAudio.hpp"
 #include <filesystem>
 #include <string>
@@ -32,14 +33,14 @@ AudioCollection::AudioCollection() {
  * @param folderPath Path to stored collection
  * @return Read error code
  */
-int AudioCollection::indexCollection(fs::path folderPath) {
-    if (!fs::is_directory(folderPath)) {
+int AudioCollection::indexCollection(fs::path &collectionPath, AudioCacheTable &cache) {
+    if (!fs::is_directory(collectionPath)) {
         return 2;
     }
 
-    this->Name = folderPath.filename();
+    this->Name = collectionPath.filename();
 
-    for (const auto &entry : fs::directory_iterator(folderPath)) {
+    for (const auto &entry : fs::directory_iterator(collectionPath)) {
         fs::path trackPath = entry.path();
         std::string trackFileName = trackPath.filename();
 
@@ -54,7 +55,13 @@ int AudioCollection::indexCollection(fs::path folderPath) {
             std::string trackName = std::regex_replace((std::string)trackPath.stem(), std::regex("_"), " ");
             
             RawAudio track;
-            track.Name = trackName;
+            
+            if (cache.Completed) {
+                track.AudioFilePath = cache.TrackCacheMap[trackPath];
+                track.CoverFilePath = cache.IconCacheMap[collectionPath];
+            } else {
+                // TODO: get metadata using Qt
+            }
 
             this->addTrack(track);
         }

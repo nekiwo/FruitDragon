@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-#include <iostream>
 #include <filesystem>
 #include <string>
 
@@ -12,11 +11,11 @@ namespace fs = std::filesystem;
 TEST(FileTreeTest, IOTest) {
     // Config test needs to pass for this one
     Config config;
-    std::string configPath = fs::current_path().parent_path() / "tests/config/config.json";
-    config.readFromFile(configPath);
+    std::string configFolderPath = fs::current_path().parent_path() / "tests/config/";
+    config.readFromFolder(configFolderPath);
 
     FileTree tree;
-    int error = tree.loadFromPath(config.MediaFolderPath);
+    int error = tree.loadFromPath((std::string)config.MediaFolderPath, *config.Cache);
     ASSERT_EQ(error, 0);
 
     EXPECT_EQ(tree.Albums.size(), 2); // Two albums

@@ -9,8 +9,8 @@ namespace fs = std::filesystem;
 
 TEST(ConfigTest, IOTest) {
     Config config;
-    std::string configPath = fs::current_path().parent_path() / "tests/config/config.json";
-    int error = config.readFromFile(configPath);
+    std::string configFolderPath = fs::current_path().parent_path() / "tests/config/";
+    int error = config.readFromFolder(configFolderPath);
 
     ASSERT_EQ(error, 0);
     ASSERT_EQ(config.Port, 8326);

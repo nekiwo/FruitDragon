@@ -9,11 +9,12 @@
  * 
  */
 
-#include <iostream>
+#include "audio/FileTree.hpp"
+
 #include <filesystem>
 #include <string>
 
-#include "audio/FileTree.hpp"
+#include "audio/AudioCacheTable.hpp"
 #include "audio/AudioCollection.hpp"
 
 namespace fs = std::filesystem;
@@ -29,7 +30,7 @@ FileTree::FileTree() {
  * @param filePath Path to stored media
  * @return Read error code
  */
-int FileTree::loadFromPath(std::string folderPath) {
+int FileTree::loadFromPath(std::string const &folderPath, AudioCacheTable &cache) {
     if (!fs::is_directory(folderPath)) {
         return 2;
     }
@@ -39,13 +40,13 @@ int FileTree::loadFromPath(std::string folderPath) {
         std::string dirName = path.filename();
 
         if (dirName == "Singles") {
-            int error = this->Singles.indexCollection(path);
+            int error = this->Singles.indexCollection(path, cache);
             if (error != 0) return error;
         } else if (dirName == "Albums") {
             for (const auto &albumEntry : fs::directory_iterator(folderPath)) {
                 fs::path albumDir = albumEntry.path();
                 AudioCollection album;
-                int error = album.indexCollection(albumDir);
+                int error = album.indexCollection(albumDir, cache);
                 if (error != 0) return error;
                 this->Albums.push_back(album);
             }

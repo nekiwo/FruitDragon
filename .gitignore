@@ -152,6 +152,7 @@ vite.config.ts.timestamp-*
 
 # Builds & CMake
 backend/build
+build
 backend/bin
 Testing/Temporary
 

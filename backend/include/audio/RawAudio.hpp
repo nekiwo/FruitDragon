@@ -13,12 +13,14 @@
 #define RAW_AUDIO
 
 #include <string>
+#include <vector>
 
 class RawAudio {
     public:
         RawAudio();
-        std::string ID;
         std::string Name;
+        std::vector<std::string> Artists;
+        int Year;
         std::string AudioFilePath;
         std::string CoverFilePath;
         int readFromFile(std::string filePath);

@@ -14,6 +14,7 @@
 
 #include <string>
 #include <vector>
+#include "audio/AudioCacheTable.hpp"
 #include "audio/AudioCollection.hpp"
 
 class FileTree {
@@ -22,7 +23,7 @@ class FileTree {
         AudioCollection Singles;
         std::vector<AudioCollection> Albums;
         std::vector<AudioCollection> Playlists;
-        int loadFromPath(std::string folderPath);
+        int loadFromPath(std::string const &folderPath, AudioCacheTable &cache);
 };
 
 #endif

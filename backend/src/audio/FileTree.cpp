@@ -36,15 +36,17 @@ int FileTree::loadFromPath(std::string folderPath) {
 
     for (const auto &entry : fs::directory_iterator(folderPath)) {
         fs::path path = entry.path();
-        std::string dirName = path.parent_path().filename();
+        std::string dirName = path.filename();
 
         if (dirName == "Singles") {
-            this->Singles.indexCollection(path);
+            int error = this->Singles.indexCollection(path);
+            if (error != 0) return error;
         } else if (dirName == "Albums") {
             for (const auto &albumEntry : fs::directory_iterator(folderPath)) {
                 fs::path albumDir = albumEntry.path();
                 AudioCollection album;
-                album.indexCollection(albumDir);
+                int error = album.indexCollection(albumDir);
+                if (error != 0) return error;
                 this->Albums.push_back(album);
             }
         }

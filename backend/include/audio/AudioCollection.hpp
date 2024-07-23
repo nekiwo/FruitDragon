@@ -12,9 +12,14 @@
 #ifndef AUDIO_COLLECTION
 #define AUDIO_COLLECTION
 
+#include <filesystem>
 #include <string>
+#include <unordered_set>
 #include <vector>
 #include "audio/RawAudio.hpp"
+
+namespace fs = std::filesystem;
+
 
 class AudioCollection {
     public:
@@ -22,10 +27,12 @@ class AudioCollection {
         std::string Name;
         std::string ID;
         std::string CoverFilePath;
-        int indexCollection(std::string folderPath);
+        int indexCollection(fs::path folderPath);
         void addTrack(RawAudio &track);
+        int getTrackCount();
 
     private:
+        std::unordered_set<std::string> supportedIconExtensions;
         std::vector<RawAudio> tracks;
         int indexFromJSON();
         int saveToJSON();

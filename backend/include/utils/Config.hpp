@@ -12,13 +12,16 @@
 #ifndef CONFIG
 #define CONFIG
 
+#include <filesystem>
 #include <string>
+
+namespace fs = std::filesystem;
 
 
 class Config {
     public:
         Config();
-        std::string MediaFolderPath;
+        fs::path MediaFolderPath;
         int Port;
         int readFromFile(std::string filePath);
 };

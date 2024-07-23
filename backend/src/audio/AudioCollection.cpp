@@ -11,9 +11,18 @@
 
 #include "audio/AudioCollection.hpp"
 
+#include "audio/RawAudio.hpp"
+#include <filesystem>
+#include <string>
+#include <iostream>
+#include <vector>
+#include <unordered_set>
+
+namespace fs = std::filesystem;
+
 
 AudioCollection::AudioCollection() {
-
+    supportedIconExtensions.insert(".png");
 }
 
 /**
@@ -22,8 +31,20 @@ AudioCollection::AudioCollection() {
  * @param folderPath Path to stored collection
  * @return Read error code
  */
-int AudioCollection::indexCollection(std::string folderPath) {
+int AudioCollection::indexCollection(fs::path folderPath) {
+    if (!fs::is_directory(folderPath)) {
+        return 2;
+    }
 
+    for (const auto &entry : fs::directory_iterator(folderPath)) {
+        fs::path path = entry.path();
+        std::string trackFileName = path.filename();
+
+        // Overwritten icon of the album
+        if (path.stem() == "icon" && supportedIconExtensions.contains(path.extension())) {
+
+        }
+    }
 }
 
 /**
@@ -53,4 +74,13 @@ int AudioCollection::indexFromJSON() {
  */
 int AudioCollection::saveToJSON() {
 
+}
+
+/**
+ * @brief Returns number of tracks in the collection
+ * 
+ * @return Track count
+ */
+int AudioCollection::getTrackCount() {
+    return tracks.size();
 }

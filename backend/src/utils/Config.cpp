@@ -10,12 +10,14 @@
  */
 
 #include <fstream>
+#include <filesystem>
 #include <string>
 #include <nlohmann/json.hpp>
 
 #include "utils/Config.hpp"
 
 using json = nlohmann::json;
+namespace fs = std::filesystem;
 
 
 Config::Config() {
@@ -31,8 +33,15 @@ Config::Config() {
 int Config::readFromFile(std::string filePath) {
     std::ifstream in(filePath);
     json data = json::parse(in);
+    
+    fs::path mediaFolderPathObj(data["mediaPath"]);
+    if (mediaFolderPathObj.is_absolute()) {
+        this->MediaFolderPath = mediaFolderPathObj;
+    } else {
+        fs::path filePathObj(filePath);
+        this->MediaFolderPath = filePathObj.parent_path() / mediaFolderPathObj; 
+    }
 
-    this->MediaFolderPath = data["mediaPath"];
     this->Port = data["port"];
 
     return 0;

@@ -15,10 +15,11 @@
 #include "audio/RawAudio.hpp"
 #include <filesystem>
 #include <string>
-#include <iostream>
 #include <regex>
+#include <taglib/tstring.h>
 #include <vector>
 #include <unordered_set>
+#include <taglib/fileref.h> 
 
 namespace fs = std::filesystem;
 
@@ -59,8 +60,25 @@ int AudioCollection::indexCollection(fs::path &collectionPath, AudioCacheTable &
             if (cache.Completed) {
                 track.AudioFilePath = cache.TrackCacheMap[trackPath];
                 track.CoverFilePath = cache.IconCacheMap[collectionPath];
+
+                // track.Name = 
+                // track.Artists.push_back();
+                // track.TrackNumber = 
+                // track.Year = 
             } else {
-                // TODO: get metadata using Qt
+                // Load metadata from original file
+                TagLib::FileRef audioFile(((std::string)trackPath).c_str());
+                TagLib::Tag* audioTag = audioFile.tag();
+                track.Name = audioTag->title().to8Bit(true);
+                track.Artists.push_back(audioTag->artist().to8Bit(true));
+                track.TrackNumber = audioTag->track();
+                track.Year = audioTag->year();
+
+                // TODO: Generate a standalone PNG icon file
+
+
+                // TODO: Cache the whole thing into JSON
+
             }
 
             this->addTrack(track);

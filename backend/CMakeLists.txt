@@ -16,6 +16,7 @@ file(GLOB_RECURSE headers src/*.hpp)
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
 find_package(nlohmann_json CONFIG REQUIRED) # nlohmann/json linking
+find_package(taglib CONFIG REQUIRED) # nlohmann/json linking
 find_package(Qt6 REQUIRED COMPONENTS Core Network) # Qt6 linking
 
 # General library

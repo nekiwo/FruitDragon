@@ -20,7 +20,8 @@ class RawAudio {
         RawAudio();
         std::string Name;
         std::vector<std::string> Artists;
-        int Year;
+        unsigned int TrackNumber;
+        unsigned int Year;
         std::string AudioFilePath;
         std::string CoverFilePath;
         int readFromFile(std::string filePath);

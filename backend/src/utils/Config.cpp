@@ -50,11 +50,6 @@ int Config::readFromFolder(std::string &folderPath) {
     AudioCacheTable cache;
     this->Cache = &cache;
 
-    if (!fs::exists(folderPathObj / "cache.json")) {
-        this->Cache->Completed = false;
-        return 0;
-    }
-
     std::ifstream inCache(folderPathObj / "cache.json");
     json cacheData = json::parse(inCache);
     
@@ -65,8 +60,6 @@ int Config::readFromFolder(std::string &folderPath) {
     for (std::string originalCollectionPath : cacheData["icons"]) {
         this->Cache->IconCacheMap[originalCollectionPath] = (std::string)cacheData["icons"][originalCollectionPath];
     }
-
-    this->Cache->Completed = true;
 
     return 0;
 }

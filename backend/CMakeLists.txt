@@ -25,12 +25,13 @@ if(NOT bashOut STREQUAL "")
 endif()
 
 find_package(nlohmann_json CONFIG REQUIRED) # nlohmann/json linking
-find_package(taglib CONFIG REQUIRED) # nlohmann/json linking
+find_package(ZLIB) # TagLib linking
+find_package(TagLib REQUIRED) # TagLib linking
 find_package(Qt6 REQUIRED COMPONENTS Core Network) # Qt6 linking
 
 # General library
 add_library(serverLib ${sources} ${headers})
-target_link_libraries(serverLib PRIVATE nlohmann_json::nlohmann_json Qt6::Core Qt6::Network) #GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main 
+target_link_libraries(serverLib PRIVATE nlohmann_json::nlohmann_json Qt6::Core Qt6::Network TagLib::tag) #GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main tagreader
 
 # Building examples
 add_executable(fd_server ${CMAKE_SOURCE_DIR}/src/server.cpp)

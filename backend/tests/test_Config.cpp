@@ -9,7 +9,8 @@ namespace fs = std::filesystem;
 
 TEST(ConfigTest, IOTest) {
     Config config;
-    std::string configFolderPath = fs::current_path().parent_path() / "tests/config/";
+    std::string configFolderPath = fs::current_path().parent_path() / "backend/tests/config/";
+    std::cout << (std::string)configFolderPath << std::endl;
     int error = config.readFromFolder(configFolderPath);
 
     ASSERT_EQ(error, 0);

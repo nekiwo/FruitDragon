@@ -23,7 +23,7 @@ class FileTree {
         AudioCollection Singles;
         std::vector<AudioCollection> Albums;
         std::vector<AudioCollection> Playlists;
-        int loadFromPath(std::string const &folderPath, AudioCacheTable &cache);
+        int loadFromPath(std::string const &folderPath, AudioCacheTable &cache, Config &config);
 };
 
 #endif

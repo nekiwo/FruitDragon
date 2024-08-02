@@ -11,11 +11,12 @@ namespace fs = std::filesystem;
 TEST(FileTreeTest, IOTest) {
     // Config test needs to pass for this one
     Config config;
-    std::string configFolderPath = fs::current_path().parent_path() / "tests/config/";
+    std::string configFolderPath = fs::current_path().parent_path().parent_path() / "tests/config/";
+    std::cout << (std::string)configFolderPath << std::endl;
     config.readFromFolder(configFolderPath);
 
     FileTree tree;
-    int error = tree.loadFromPath((std::string)config.MediaFolderPath, *config.Cache);
+    int error = tree.loadFromPath((std::string)config.MediaFolderPath, *config.Cache, config);
     ASSERT_EQ(error, 0);
 
     EXPECT_EQ(tree.Albums.size(), 2); // Two albums

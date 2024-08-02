@@ -12,18 +12,23 @@
 #ifndef RAW_AUDIO
 #define RAW_AUDIO
 
+#include <filesystem>
 #include <string>
 #include <vector>
+
+namespace fs = std::filesystem;
+
 
 class RawAudio {
     public:
         RawAudio();
         std::string Name;
         std::vector<std::string> Artists;
+        unsigned int LengthInSeconds;
         unsigned int TrackNumber;
         unsigned int Year;
-        std::string AudioFilePath;
-        std::string CoverFilePath;
+        fs::path AudioFilePath;
+        fs::path CoverFilePath;
         int readFromFile(std::string filePath);
         int loadFromFile(std::string filePath);
         char* getBuffer(int startIndex, int endIndex);

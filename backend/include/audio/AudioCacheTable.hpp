@@ -21,7 +21,6 @@ namespace fs = std::filesystem;
 class AudioCacheTable {
     public:
         AudioCacheTable();
-        bool Completed = false;
         std::unordered_map<fs::path, fs::path> TrackCacheMap; // original file -> cache file map
         std::unordered_map<fs::path, fs::path> IconCacheMap; // collection path -> icon file map
 };

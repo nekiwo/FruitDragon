@@ -14,6 +14,7 @@
 
 #include "audio/AudioCacheTable.hpp"
 #include "audio/RawAudio.hpp"
+#include "utils/Config.hpp"
 #include <filesystem>
 #include <string>
 #include <unordered_set>
@@ -28,7 +29,7 @@ class AudioCollection {
         std::string Name;
         std::string ID;
         fs::path CoverFilePath;
-        int indexCollection(fs::path &collectionPath, AudioCacheTable &cache);
+        int indexCollection(fs::path &collectionPath, AudioCacheTable &cache, Config &config);
         void addTrack(RawAudio &track);
         int getTrackCount();
 

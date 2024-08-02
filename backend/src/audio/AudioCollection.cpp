@@ -13,10 +13,13 @@
 
 #include "audio/AudioCacheTable.hpp"
 #include "audio/RawAudio.hpp"
+#include "utils/Config.hpp"
 #include <filesystem>
+#include <fstream>
 #include <string>
 #include <regex>
 #include <taglib/tstring.h>
+#include <thread>
 #include <vector>
 #include <unordered_set>
 #include <taglib/fileref.h> 
@@ -34,13 +37,15 @@ AudioCollection::AudioCollection() {
  * @param folderPath Path to stored collection
  * @return Read error code
  */
-int AudioCollection::indexCollection(fs::path &collectionPath, AudioCacheTable &cache) {
+int AudioCollection::indexCollection(fs::path &collectionPath, AudioCacheTable &cache, Config &config) {
     if (!fs::is_directory(collectionPath)) {
         return 2;
     }
 
     this->Name = collectionPath.filename();
 
+    // For each track
+    int trackIterator = 0;
     for (const auto &entry : fs::directory_iterator(collectionPath)) {
         fs::path trackPath = entry.path();
         std::string trackFileName = trackPath.filename();
@@ -56,8 +61,10 @@ int AudioCollection::indexCollection(fs::path &collectionPath, AudioCacheTable &
             std::string trackName = std::regex_replace((std::string)trackPath.stem(), std::regex("_"), " ");
             
             RawAudio track;
+
+            // TODO: Check if folder contains temp file
             
-            if (cache.Completed) {
+            if (fs::exists(collectionPath / ".cache")) {
                 track.AudioFilePath = cache.TrackCacheMap[trackPath];
                 track.CoverFilePath = cache.IconCacheMap[collectionPath];
 
@@ -69,22 +76,70 @@ int AudioCollection::indexCollection(fs::path &collectionPath, AudioCacheTable &
                 // Load metadata from original file
                 TagLib::FileRef audioFile(((std::string)trackPath).c_str());
                 TagLib::Tag* audioTag = audioFile.tag();
+                TagLib::AudioProperties* properties = audioFile.audioProperties();
                 track.Name = audioTag->title().to8Bit(true);
                 track.Artists.push_back(audioTag->artist().to8Bit(true));
+                track.LengthInSeconds = properties->lengthInSeconds();
                 track.TrackNumber = audioTag->track();
                 track.Year = audioTag->year();
 
-                // TODO: Generate a standalone PNG icon file
+                // Generate a standalone PNG icon file
+                fs::path iconPath = trackPath.replace_filename("icon");
+                TagLib::StringList names = audioFile.complexPropertyKeys();
+                for(const auto &name : names) {
+                    const auto& properties = audioFile.complexProperties(name);
+                    for(const auto &property : properties) {
+                        for(const auto &[key, value] : property) {
+                            if(value.type() == TagLib::Variant::ByteVector) {
+                                std::ofstream picture;
+                                picture.open((std::string)iconPath, std::ios_base::out | std::ios_base::binary);
+                                picture << value.value<TagLib::ByteVector>();
+                                picture.close();
+                            }
+                        }
+                    }
+                }
 
+                // TODO: Create audio cache
+                fs::path cachedTrackPath(config.MediaFolderPath / "Cache" / this->Name / ("track" + std::to_string(trackIterator)));
+                
 
-                // TODO: Cache the whole thing into JSON
+                // Put newly generated files into JSON
+                cache.TrackCacheMap[trackPath] = cachedTrackPath;
+                cache.IconCacheMap[collectionPath] = iconPath;
 
+                // Create a temp file to signifify the collection has been cached
+                std::ofstream { ".cached" };
+
+                this->addTrack(track);
             }
-
-            this->addTrack(track);
         }
+
+        trackIterator++;
     }
 
+    return 0;
+}
+
+/**
+ * @brief Executes CLI
+ * 
+ * @param programName 
+ */
+void executeProgram(std::string programName) {
+    system(programName.c_str());
+}
+
+/**
+ * @brief Converts any audio file to WAV using FFmpeg command
+ * 
+ * @param filePath Path to file
+ * @return Error code
+ */
+int convertAudioToWAV(fs::path filePath) {
+    fs::path newFilePath = filePath.replace_extension("wav");
+    std::thread worker (executeProgram, "ffmpeg -i " + (std::string)filePath + " -acodec pcm_s24le -ar 44100 " + (std::string)newFilePath);
+    worker.join();
     return 0;
 }
 

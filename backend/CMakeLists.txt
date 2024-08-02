@@ -15,6 +15,15 @@ file(GLOB_RECURSE sources src/*.cpp)
 file(GLOB_RECURSE headers src/*.hpp)
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
+# Check if FFmpeg is installed
+execute_process(
+    COMMAND bash -c "ffmpeg -version > /dev/null"
+    ERROR_VARIABLE bashOut
+)
+if(NOT bashOut STREQUAL "")
+    message(FATAL_ERROR "FFmpeg CLI tool not found.")
+endif()
+
 find_package(nlohmann_json CONFIG REQUIRED) # nlohmann/json linking
 find_package(taglib CONFIG REQUIRED) # nlohmann/json linking
 find_package(Qt6 REQUIRED COMPONENTS Core Network) # Qt6 linking

@@ -14,7 +14,6 @@
 #include <filesystem>
 #include <string>
 
-#include "audio/AudioCacheTable.hpp"
 #include "audio/AudioCollection.hpp"
 #include "utils/Config.hpp"
 
@@ -31,7 +30,7 @@ FileTree::FileTree() {
  * @param filePath Path to stored media
  * @return Read error code
  */
-int FileTree::loadFromPath(std::string const &folderPath, AudioCacheTable &cache, Config &config) {
+int FileTree::loadFromPath(std::string const &folderPath, Config &config) {
     if (!fs::is_directory(folderPath)) {
         return 2;
     }
@@ -41,18 +40,19 @@ int FileTree::loadFromPath(std::string const &folderPath, AudioCacheTable &cache
         std::string dirName = subfolderPath.filename();
 
         if (dirName == "Singles") {
-            int error = this->Singles.indexCollection(subfolderPath, cache, config);
+            int error = this->Singles.indexCollection(subfolderPath, config);
             if (error != 0) return error;
         } else if (dirName == "Albums") {
             for (const auto &albumEntry : fs::directory_iterator(subfolderPath)) {
                 fs::path albumDir = albumEntry.path();
                 AudioCollection album;
-                int error = album.indexCollection(albumDir, cache, config);
+                int error = album.indexCollection(albumDir, config);
                 if (error != 0) return error;
                 this->Albums.push_back(album);
             }
         }
     }
 
-    return 0;
+    int error = config.saveCacheMap();
+    return error;
 }

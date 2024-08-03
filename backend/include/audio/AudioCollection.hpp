@@ -12,7 +12,6 @@
 #ifndef AUDIO_COLLECTION
 #define AUDIO_COLLECTION
 
-#include "audio/AudioCacheTable.hpp"
 #include "audio/RawAudio.hpp"
 #include "utils/Config.hpp"
 #include <filesystem>
@@ -29,7 +28,7 @@ class AudioCollection {
         std::string Name;
         std::string ID;
         fs::path CoverFilePath;
-        int indexCollection(fs::path &collectionPath, AudioCacheTable &cache, Config &config);
+        int indexCollection(fs::path &collectionPath, Config &config);
         void addTrack(RawAudio &track);
         int getTrackCount();
 

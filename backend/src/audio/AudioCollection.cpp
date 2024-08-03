@@ -11,7 +11,6 @@
 
 #include "audio/AudioCollection.hpp"
 
-#include "audio/AudioCacheTable.hpp"
 #include "audio/RawAudio.hpp"
 #include "utils/Config.hpp"
 #include <filesystem>
@@ -21,6 +20,7 @@
 #include <regex>
 #include <taglib/tstring.h>
 #include <thread>
+#include <unordered_map>
 #include <vector>
 #include <unordered_set>
 #include <taglib/fileref.h> 
@@ -48,7 +48,8 @@ void executeProgram(std::string programName) {
  * @return Error code
  */
 int convertAudioToWAV(fs::path originalFilePath, fs::path newFilePath) {
-    std::thread worker (executeProgram, "ffmpeg -i " + (std::string)originalFilePath + " -acodec pcm_s24le -ar 44100 " + (std::string)newFilePath);
+    std::string ffmpegCommand = "ffmpeg -y -i \"" + (std::string)originalFilePath + "\" -loglevel quiet -acodec pcm_s24le -ar 44100 \"" + (std::string)newFilePath + "\"";
+    std::thread worker (executeProgram, ffmpegCommand);
     worker.join();
     return 0;
 }
@@ -59,7 +60,7 @@ int convertAudioToWAV(fs::path originalFilePath, fs::path newFilePath) {
  * @param folderPath Path to stored collection
  * @return Read error code
  */
-int AudioCollection::indexCollection(fs::path &collectionPath, AudioCacheTable &cache, Config &config) {
+int AudioCollection::indexCollection(fs::path &collectionPath, Config &config) {
     if (!fs::is_directory(collectionPath)) {
         return 2;
     }
@@ -86,8 +87,8 @@ int AudioCollection::indexCollection(fs::path &collectionPath, AudioCacheTable &
 
             // Check if folder contains temp file
             if (fs::exists(collectionPath / ".cache")) {
-                track.AudioFilePath = cache.TrackCacheMap[trackPath];
-                track.CoverFilePath = cache.IconCacheMap[collectionPath];
+                track.AudioFilePath = config.TrackCacheMap[trackPath];
+                track.CoverFilePath = config.IconCacheMap[collectionPath];
 
                 // track.Name = 
                 // track.Artists.push_back();
@@ -128,20 +129,18 @@ int AudioCollection::indexCollection(fs::path &collectionPath, AudioCacheTable &
                     std::filesystem::create_directory(config.MediaFolderPath / "Cache" / this->Name);
                 }
                 const fs::path cachedTrackPath = config.MediaFolderPath / "Cache" / this->Name / ("track" + std::to_string(trackIterator) + ".wav");
-                std::cout << (std::string)trackPath << std::endl;
-                std::cout << (std::string)cachedTrackPath << std::endl;
+                std::cout << cachedTrackPath.string() << std::endl;
                 int error = convertAudioToWAV(trackPath, cachedTrackPath);
                 if (error != 0) {
                     return error;
                 }
 
                 // Put newly generated files into JSON
-                // TODO: fix fatal error
-                cache.TrackCacheMap[trackPath] = cachedTrackPath;
-                cache.IconCacheMap[collectionPath] = iconPath;
+                config.TrackCacheMap[trackPath.string()] = cachedTrackPath.string();
+                config.IconCacheMap[collectionPath.string()] = iconPath.string();
 
                 // Create a temp file to signifify the collection has been cached
-                std::ofstream { ".cached" };
+                std::ofstream { trackPath.parent_path() / ".cached" };
 
                 this->addTrack(track);
             }

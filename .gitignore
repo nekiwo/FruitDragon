@@ -155,7 +155,6 @@ backend/build
 build
 backend/bin
 Testing/Temporary
-backend/tests/music/Cache
 
 # VS Code
 .vscode
@@ -163,3 +162,4 @@ backend/tests/music/Cache
 # Testing
 .cached*
 backend/tests/music/Cache
+backend/tests/config/cache.json

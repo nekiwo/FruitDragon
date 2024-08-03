@@ -12,9 +12,9 @@
 #ifndef CONFIG
 #define CONFIG
 
-#include "audio/AudioCacheTable.hpp"
 #include <filesystem>
 #include <string>
+#include <unordered_map>
 
 namespace fs = std::filesystem;
 
@@ -22,10 +22,13 @@ namespace fs = std::filesystem;
 class Config {
     public:
         Config();
+        fs::path ConfigFolderPath;
         fs::path MediaFolderPath;
         int Port;
-        int readFromFolder(std::string &folderPath);
-        AudioCacheTable* Cache;
+        int readFromFolder(fs::path &folderPath);
+        int saveCacheMap();
+        std::unordered_map<std::string, std::string> TrackCacheMap; // original file -> cache file map
+        std::unordered_map<std::string, std::string> IconCacheMap; // collection path -> icon file map
 };
 
 #endif

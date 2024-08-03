@@ -48,7 +48,7 @@ void executeProgram(std::string programName) {
  * @return Error code
  */
 int convertAudioToWAV(fs::path originalFilePath, fs::path newFilePath) {
-    std::string ffmpegCommand = "ffmpeg -y -i \"" + (std::string)originalFilePath + "\" -loglevel quiet -acodec pcm_s24le -ar 44100 \"" + (std::string)newFilePath + "\"";
+    std::string ffmpegCommand = "ffmpeg -y -i \"" + (std::string)originalFilePath + "\" -loglevel quiet -acodec pcm_s16le -ar 44100 \"" + (std::string)newFilePath + "\"";
     std::thread worker (executeProgram, ffmpegCommand);
     worker.join();
     return 0;
@@ -122,14 +122,13 @@ int AudioCollection::indexCollection(fs::path &collectionPath, Config &config) {
                     }
                 }
 
-                // Create audio cache as signed 24-bit little-endian PCM audio in a WAV container
+                // Create audio cache as signed 16-bit little-endian 44.1khz PCM audio in a WAV container
                 if (!fs::exists(config.MediaFolderPath / "Cache") || !fs::exists(config.MediaFolderPath / "Cache" / this->Name)) {
                     // TODO: error handling (and every other time `std::filesystem` is used)
                     std::filesystem::create_directory(config.MediaFolderPath / "Cache");
                     std::filesystem::create_directory(config.MediaFolderPath / "Cache" / this->Name);
                 }
                 const fs::path cachedTrackPath = config.MediaFolderPath / "Cache" / this->Name / ("track" + std::to_string(trackIterator) + ".wav");
-                std::cout << cachedTrackPath.string() << std::endl;
                 int error = convertAudioToWAV(trackPath, cachedTrackPath);
                 if (error != 0) {
                     return error;
@@ -161,24 +160,8 @@ void AudioCollection::addTrack(RawAudio &track) {
     this->tracks.push_back(&track);
 }
 
-/**
- * @brief Loads audio collection from JSON
- * 
- * @param configPath Path to config folder
- * @return Read error code
- */
-int AudioCollection::indexFromJSON() {
-
-}
-
-/**
- * @brief Saves the indexed collection to JSON cache
- * 
- * @param configPath Path to config folder
- * @return Read error code
- */
-int AudioCollection::saveToJSON() {
-
+RawAudio& AudioCollection::getTrack(unsigned int index) {
+    return *tracks.at(index);
 }
 
 /**

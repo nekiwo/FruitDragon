@@ -13,6 +13,7 @@
 #define RAW_AUDIO
 
 #include <filesystem>
+#include <fstream>
 #include <string>
 #include <vector>
 
@@ -29,9 +30,14 @@ class RawAudio {
         unsigned int Year;
         fs::path AudioFilePath;
         fs::path CoverFilePath;
-        int readFromFile(std::string filePath);
-        int loadFromFile(std::string filePath);
-        char* getBuffer(int startIndex, int endIndex);
+        int openFile();
+        int closeFile();
+        std::vector<char> getBuffer(uint32_t chunkSize);
+        std::vector<char> getBufferAt(uint32_t startIndex, uint32_t chunkSize);
+    private:
+        bool isOpened = false;
+        std::ifstream inAudio;
+        uint32_t dataSize;
 };
 
 #endif

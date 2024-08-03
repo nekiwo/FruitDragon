@@ -10,6 +10,12 @@
  */
 
 #include "audio/RawAudio.hpp"
+#include <cstddef>
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+
+namespace fs = std::filesystem;
 
 
 RawAudio::RawAudio() {
@@ -17,32 +23,66 @@ RawAudio::RawAudio() {
 }
 
 /**
- * @brief Loads the audio metadata into the class object
+ * @brief Opens file before reading buffers
  * 
- * @param filePath Path to the audio file
- * @return Read error code
+ * @return Error code
  */
-int RawAudio::readFromFile(std::string filePath) {
-
+int RawAudio::openFile() {
+    if (isOpened) {
+        return 0;
+    }
+    std::cout << this->AudioFilePath.string() << std::endl;
+    inAudio.open(this->AudioFilePath, std::ios::binary);
+    inAudio.ignore(16);
+    inAudio.read(reinterpret_cast<char*>(&dataSize), sizeof(dataSize));
+    isOpened = true;
+    return 0;
 }
 
 /**
- * @brief Loads the audio into the class object, making it accessable through `getBuffer` 
+ * @brief Closes file
  * 
- * @param filePath Path to the audio file
- * @return Read error code
+ * @return Error code
  */
-int RawAudio::loadFromFile(std::string filePath) {
-
+int RawAudio::closeFile() {
+    inAudio.close();
+    isOpened = false;
+    return 0;
 }
 
 /**
  * @brief Returns audio buffer in specified range, ideal for streaming
  * 
- * @param startIndex Byte index
- * @param endIndex Byte index
+ * @param chunkSize Size in bytes
  * @return Byte array of audio
  */
-char* RawAudio::getBuffer(int startIndex, int endIndex) {
+std::vector<char> RawAudio::getBuffer(uint32_t chunkSize) {
+    std::vector<char> buffer (chunkSize, 0);
 
+    if (!inAudio.eof()) {
+        inAudio.read(buffer.data(), buffer.size());
+    }
+
+    return buffer;
+}
+
+/**
+ * @brief Returns audio buffer in specified range, ideal for streaming (closes and opens file before doing so)
+ * 
+ * @param startIndex Number of bytes skipped
+ * @param chunkSize Size in bytes
+ * @return Byte array of audio
+ */
+std::vector<char> RawAudio::getBufferAt(uint32_t startIndex, uint32_t chunkSize) {
+    closeFile();
+    openFile();
+
+    std::vector<char> buffer (chunkSize, 0);
+
+    if (!inAudio.eof()) {
+        inAudio.ignore(startIndex);
+        inAudio.read(buffer.data(), buffer.size());
+    }
+
+    return buffer;
 }

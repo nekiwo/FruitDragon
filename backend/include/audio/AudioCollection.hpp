@@ -30,6 +30,7 @@ class AudioCollection {
         fs::path CoverFilePath;
         int indexCollection(fs::path &collectionPath, Config &config);
         void addTrack(RawAudio &track);
+        RawAudio& getTrack(unsigned int index);
         int getTrackCount();
 
     private:
@@ -38,8 +39,6 @@ class AudioCollection {
         // Commonly supported web sound file formats
         std::unordered_set<std::string> supportedTrackExtensions = {".aiff", ".flac", ".m4a", ".mp3", ".ogg", ".wav", ".webm"};
         std::vector<RawAudio*> tracks;
-        int indexFromJSON();
-        int saveToJSON();
 };
 
 #endif

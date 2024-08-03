@@ -155,6 +155,11 @@ backend/build
 build
 backend/bin
 Testing/Temporary
+backend/tests/music/Cache
 
 # VS Code
 .vscode
+
+# Testing
+.cached*
+backend/tests/music/Cache

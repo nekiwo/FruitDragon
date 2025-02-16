@@ -36,19 +36,26 @@ int Config::readFromFolder(fs::path &folderPath) {
 
     // Importing config file
     if (!fs::exists(folderPath / "config.json")) {
-        return 1;
+        return 2; // No such file or directory
     }
     std::ifstream inConfig(folderPath / "config.json");
     json configData = json::parse(inConfig);
     
-    fs::path mediaFolderPathObj(configData["mediaPath"]);
+    fs::path mediaFolderPathObj(configData["media_ath"]);
     if (mediaFolderPathObj.is_absolute()) {
         this->MediaFolderPath = mediaFolderPathObj;
     } else {
         this->MediaFolderPath = folderPath / mediaFolderPathObj; 
     }
 
-    this->Port = configData["port"];
+    this->HTTPPort = configData["http_port"];
+    this->WSPort = configData["ws_port"];
+    this->ChunkSize = configData["chunk_size"];
+
+    // Chunk size has to be divisible by 4
+    if (ChunkSize % 4 != 0) {
+        return 22; // Invalid argument
+    }
 
     // Read cache
     if (!fs::exists(folderPath / "cache.json")) {

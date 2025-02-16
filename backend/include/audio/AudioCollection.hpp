@@ -16,8 +16,10 @@
 #include "utils/Config.hpp"
 #include <filesystem>
 #include <string>
+#include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include <memory>
 
 namespace fs = std::filesystem;
 
@@ -29,8 +31,8 @@ class AudioCollection {
         std::string ID;
         fs::path CoverFilePath;
         int indexCollection(fs::path &collectionPath, Config &config);
-        void addTrack(RawAudio &track);
-        RawAudio& getTrack(unsigned int index);
+        void addTrack(unsigned int index);
+        RawAudio* getTrack(unsigned int index);
         int getTrackCount();
 
     private:
@@ -38,7 +40,7 @@ class AudioCollection {
         std::unordered_set<std::string> supportedIconExtensions = {".apng", ".png", ".avif", ".gif", ".jpg", ".jpeg", ".jfif", ".pjpeg", ".pjp", ".webp"};
         // Commonly supported web sound file formats
         std::unordered_set<std::string> supportedTrackExtensions = {".aiff", ".flac", ".m4a", ".mp3", ".ogg", ".wav", ".webm"};
-        std::vector<RawAudio*> tracks;
+        std::unordered_map<unsigned int, RawAudio*> tracks;
 };
 
 #endif

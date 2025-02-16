@@ -24,7 +24,9 @@ class Config {
         Config();
         fs::path ConfigFolderPath;
         fs::path MediaFolderPath;
-        int Port;
+        int HTTPPort;
+        int WSPort;
+        uint32_t ChunkSize;
         int readFromFolder(fs::path &folderPath);
         int saveCacheMap();
         std::unordered_map<std::string, std::string> TrackCacheMap; // original file -> cache file map

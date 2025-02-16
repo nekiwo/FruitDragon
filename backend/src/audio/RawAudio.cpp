@@ -31,9 +31,11 @@ int RawAudio::openFile() {
     if (isOpened) {
         return 0;
     }
-    std::cout << this->AudioFilePath.string() << std::endl;
-    inAudio.open(this->AudioFilePath, std::ios::binary);
+    inAudio.open(this->AudioFilePath);
     inAudio.ignore(16);
+    uint32_t subchunk1Size;
+    inAudio.read(reinterpret_cast<char*>(&subchunk1Size), sizeof(subchunk1Size));
+    inAudio.ignore(subchunk1Size + 4);
     inAudio.read(reinterpret_cast<char*>(&dataSize), sizeof(dataSize));
     isOpened = true;
     return 0;
@@ -51,7 +53,7 @@ int RawAudio::closeFile() {
 }
 
 /**
- * @brief Returns audio buffer in specified range, ideal for streaming
+ * @brief Returns audio buffer from beginning, ideal for streaming. This method does NOT open the file stream, which you should do before calling it. You should read in chunks divisible by 4 since each channel is 2 bytes.
  * 
  * @param chunkSize Size in bytes
  * @return Byte array of audio
@@ -67,7 +69,7 @@ std::vector<char> RawAudio::getBuffer(uint32_t chunkSize) {
 }
 
 /**
- * @brief Returns audio buffer in specified range, ideal for streaming (closes and opens file before doing so)
+ * @brief Returns audio buffer in specified range, ideal for streaming. This method automatically closes and opens file stream. You should read in chunks divisible by 4 since each channel is 2 bytes.
  * 
  * @param startIndex Number of bytes skipped
  * @param chunkSize Size in bytes

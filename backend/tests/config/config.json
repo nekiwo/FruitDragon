@@ -1,4 +1,6 @@
 {
-    "port": 8326,
-    "mediaPath": "../music"
+    "http_port": 8326,
+    "ws_port": 8327,
+    "media_path": "../music",
+    "chunk_size": 1024
 }

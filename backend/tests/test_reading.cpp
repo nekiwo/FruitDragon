@@ -2,6 +2,7 @@
 #include <filesystem>
 #include <ios>
 #include <string>
+#include <iomanip>
 
 #include "audio/FileTree.hpp"
 #include "audio/RawAudio.hpp"
@@ -32,12 +33,12 @@ TEST(FileTreeTest, IOTest) {
     ASSERT_EQ(error, 0);
 
     // Read audio chunks
-    RawAudio& track = tree.Singles.getTrack(0);
-    track.openFile();
-    std::vector<char> buffer = track.getBuffer(16);
+    RawAudio* track = tree.Singles.getTrack(0);
+    track->openFile();
+    std::vector<char> buffer = track->getBuffer(16);
 
     for (char i: buffer)
-        std::cout << std::hex << i << ' ';
+        std::cout << std::hex << std:: setfill('0') << std::setw(2) << (+i & 0xFF) << ' ';
     std::cout << std::endl;
 
     EXPECT_EQ(tree.Albums.size(), 2); // Two albums

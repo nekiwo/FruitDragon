@@ -28,8 +28,8 @@ class RawAudio {
         unsigned int LengthInSeconds;
         unsigned int TrackNumber;
         unsigned int Year;
-        fs::path AudioFilePath;
-        fs::path CoverFilePath;
+        std::string AudioFilePath;
+        std::string CoverFilePath;
         int openFile();
         int closeFile();
         std::vector<char> getBuffer(uint32_t chunkSize);

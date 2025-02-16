@@ -16,6 +16,9 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <iterator>
+#include <memory>
+#include <ostream>
 #include <string>
 #include <regex>
 #include <taglib/tstring.h>
@@ -48,7 +51,7 @@ void executeProgram(std::string programName) {
  * @return Error code
  */
 int convertAudioToWAV(fs::path originalFilePath, fs::path newFilePath) {
-    std::string ffmpegCommand = "ffmpeg -y -i \"" + (std::string)originalFilePath + "\" -loglevel quiet -acodec pcm_s16le -ar 44100 \"" + (std::string)newFilePath + "\"";
+    std::string ffmpegCommand = "ffmpeg -y -i \"" + (std::string)originalFilePath + "\" -loglevel quiet -acodec pcm_s16le -ac 2 -ar 44100 \"" + (std::string)newFilePath + "\"";
     std::thread worker (executeProgram, ffmpegCommand);
     worker.join();
     return 0;
@@ -82,13 +85,11 @@ int AudioCollection::indexCollection(fs::path &collectionPath, Config &config) {
         // Check if it's an audio file
         if (supportedTrackExtensions.contains(trackPath.extension())) {
             std::string trackName = std::regex_replace((std::string)trackPath.stem(), std::regex("_"), " ");
-            
-            RawAudio track;
 
             // Check if folder contains temp file
             if (fs::exists(collectionPath / ".cache")) {
-                track.AudioFilePath = config.TrackCacheMap[trackPath];
-                track.CoverFilePath = config.IconCacheMap[collectionPath];
+                // track->AudioFilePath = config.TrackCacheMap[trackPath];
+                // track->CoverFilePath = config.IconCacheMap[collectionPath];
 
                 // track.Name = 
                 // track.Artists.push_back();
@@ -98,12 +99,25 @@ int AudioCollection::indexCollection(fs::path &collectionPath, Config &config) {
                 // Load metadata from original file
                 TagLib::FileRef audioFile(((std::string)trackPath).c_str());
                 TagLib::Tag* audioTag = audioFile.tag();
+
+                unsigned int trackNum = audioTag->track();
+                if (tracks.contains(trackNum))
+                {
+                    trackNum = 0;
+                    while (tracks.contains(trackNum)) {
+                        trackNum++;
+                    }
+                }
+
+                this->addTrack(trackNum);
+                RawAudio* track = getTrack(trackNum);
+
                 TagLib::AudioProperties* properties = audioFile.audioProperties();
-                track.Name = audioTag->title().to8Bit(true);
-                track.Artists.push_back(audioTag->artist().to8Bit(true));
-                track.LengthInSeconds = properties->lengthInSeconds();
-                track.TrackNumber = audioTag->track();
-                track.Year = audioTag->year();
+                track->Name = audioTag->title().to8Bit(true);
+                track->Artists.push_back(audioTag->artist().to8Bit(true));
+                track->LengthInSeconds = properties->lengthInSeconds();
+                track->TrackNumber = trackNum;
+                track->Year = audioTag->year();
 
                 // Generate a standalone PNG icon file
                 const fs::path iconPath = trackPath.parent_path() / "icon.jpg" ;
@@ -122,7 +136,7 @@ int AudioCollection::indexCollection(fs::path &collectionPath, Config &config) {
                     }
                 }
 
-                // Create audio cache as signed 16-bit little-endian 44.1khz PCM audio in a WAV container
+                // Create audio cache as signed 16-bit little-endian 44.1khz PCM forced stereo audio in a WAV container
                 if (!fs::exists(config.MediaFolderPath / "Cache") || !fs::exists(config.MediaFolderPath / "Cache" / this->Name)) {
                     // TODO: error handling (and every other time `std::filesystem` is used)
                     std::filesystem::create_directory(config.MediaFolderPath / "Cache");
@@ -135,18 +149,20 @@ int AudioCollection::indexCollection(fs::path &collectionPath, Config &config) {
                 }
 
                 // Put newly generated files into JSON
+                track->AudioFilePath = cachedTrackPath.string();
+                track->CoverFilePath = iconPath.string();
                 config.TrackCacheMap[trackPath.string()] = cachedTrackPath.string();
                 config.IconCacheMap[collectionPath.string()] = iconPath.string();
 
                 // Create a temp file to signifify the collection has been cached
                 std::ofstream { trackPath.parent_path() / ".cached" };
-
-                this->addTrack(track);
             }
         }
 
         trackIterator++;
     }
+
+    std::cout << tracks[0]->AudioFilePath << std::endl;
 
     return 0;
 }
@@ -156,12 +172,13 @@ int AudioCollection::indexCollection(fs::path &collectionPath, Config &config) {
  * 
  * @param track Track object
  */
-void AudioCollection::addTrack(RawAudio &track) {
-    this->tracks.push_back(&track);
+void AudioCollection::addTrack(unsigned int index) {
+    this->tracks.insert({index, new RawAudio()});
 }
 
-RawAudio& AudioCollection::getTrack(unsigned int index) {
-    return *tracks.at(index);
+RawAudio* AudioCollection::getTrack(unsigned int index) {
+    std::cout << tracks[index]->AudioFilePath << std::endl;
+    return tracks.at(index);
 }
 
 /**
